@@ -23,7 +23,6 @@ node-gyp build --nodedir=/home/stringa/.nvm/versions/node/v6.9.2
 - Fronend: React
 - Backend: NodeJS/ES6
 
-
 ## To run the build
 - npm install
 - Possibly need these commands if your node-gyp isn't picking up the correct node version
@@ -33,12 +32,10 @@ node-gyp build --nodedir=/home/stringa/.nvm/versions/node/v6.9.2
   - This will run the client (webpack dev server) and the server
   - This will need to be modified as the demo progresses
 
-
-
 ## Notes: 
 - I would love to get the Dockerfile working for this demo as it would supply a common environment
 - I'm currently using NPM and am gonna switch over to yarn once I get this working
-
+- I used the react scripts to create the initial project. So file structure is kinda weird. server doe is in /server and /src is the client. Feel free to change things.
 
 ## React Documents
 

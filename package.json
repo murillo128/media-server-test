@@ -5,12 +5,14 @@
   "dependencies": {
     "ansi": "^0.3.1",
     "body-parser": "^1.17.1",
+    "bootstrap": "^3.3.7",
     "express": "^4.15.2",
     "lodash": "^4.17.4",
     "medooze-media-server": "0.6.0",
     "moment": "^2.18.1",
     "pug": "^2.0.0-beta11",
     "react": "^15.5.4",
+    "react-bootstrap": "^0.31.0",
     "react-dom": "^15.5.4",
     "semantic-sdp": "^2.1.0",
     "uuid": "^3.0.1",
@@ -22,6 +24,7 @@
   },
   "scripts": {
     "start": "concurrently 'npm run client' 'npm run server' ",
+    "server-local": "npm run start 127.0.0.1",
     "server": "node server/main.js",
     "client": "react-scripts start",
     "build": "react-scripts build",
