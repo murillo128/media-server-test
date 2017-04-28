@@ -12,6 +12,10 @@ export default class Home extends React.PureComponent {
         }
     }
 
+    broadcastStream() {
+        this.setState({broadcasting: true})
+    }
+
     componentWillMount() {
         navigator.mediaDevices.getUserMedia({
             audio: true,
@@ -26,8 +30,16 @@ export default class Home extends React.PureComponent {
     }
 
     render() {
+
+        const broadcastOnClick = () => {
+            console.log("ON CLICK")
+            this.setState({broadcasting: true});
+        };
+
         return (
             <div>
+
+                Local Stream from GetUserMedia
                 <div>
                 {
                     this.state.stream ? (
@@ -36,16 +48,16 @@ export default class Home extends React.PureComponent {
                             if (!this.previewEl && e) {
                                 this.previewEl = e;
                             }
-                            debugger
                             this.previewEl.srcObject = this.state.stream;
                         }}></video>
                     ) : null
                 }
                 </div>
 
-                { !this.state.broadcasting ?
-                    <Button>Broadcast Stream</Button> :
-                    'Broadcasting...'
+                {
+                    this.state.broadcasting === null ?
+                    <Button onClick={broadcastOnClick}>Broadcast Stream</Button>
+                    :'Broadcasting...'
                 }
 
             </div>
