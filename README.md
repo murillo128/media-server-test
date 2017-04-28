@@ -1,6 +1,9 @@
 #Medooze Media Server Demo
 
 - Initial Goal
+  - webrtc -> media server -> webrtc
+  
+- Final Goal
   -  webrtc -> media server -> rtp -> media server -> webrtc
 
 
