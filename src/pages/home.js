@@ -12,8 +12,8 @@ export default class Home extends React.PureComponent {
         }
     }
 
-    broadcastStream() {
-        this.setState({broadcasting: true})
+    broadcast () {
+        this.setState({broadcasting: true});
     }
 
     componentWillMount() {
@@ -32,8 +32,7 @@ export default class Home extends React.PureComponent {
     render() {
 
         const broadcastOnClick = () => {
-            console.log("ON CLICK")
-            this.setState({broadcasting: true});
+            this.broadcast();
         };
 
         return (
