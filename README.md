@@ -21,7 +21,7 @@ node-gyp build --nodedir=/home/stringa/.nvm/versions/node/v6.9.2
 
 ## Tech
 - Fronend: React
-- Backend: NodeJS/ES6
+- Backend: NodeJS/ES6 (using --harmony flag)
 
 ## To run the build
 - npm install

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Header } from 'react-bootstrap';
-import { Button } from 'react-bootstrap';
+import { Header, Button } from 'react-bootstrap';
+import Transport from '../components/transport';
 
 export default class Home extends React.PureComponent {
 
@@ -14,6 +14,12 @@ export default class Home extends React.PureComponent {
 
     broadcast () {
         this.setState({broadcasting: true});
+        this.transport = new Transport();
+
+        this.transport.once('open', () => {
+
+            console.log('Transport Open')
+        });
     }
 
     componentWillMount() {

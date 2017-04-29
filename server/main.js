@@ -6,6 +6,8 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const log = require('./log');
+const ws = require('./ws');
+
 const MediaServer = require('medooze-media-server');
 const SemanticSDP	= require("semantic-sdp");
 
@@ -49,6 +51,8 @@ const enableDebug = process.env.Node_ENV !== 'production';
 MediaServer.enableDebug(enableDebug);
 
 const endpoint = MediaServer.createEndpoint(ip);
+
+const wss = ws(server);
 
 server.listen(port, "0.0.0.0", () => {
   log.info('server started', { port });
