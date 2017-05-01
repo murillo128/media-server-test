@@ -35,6 +35,8 @@ if (process.env.ENABLE_SSL) {
   port = port || 8080;
 }
 
+const mediaServer = new MediaServer();
+
 app.get('/', (req, res) => {
   if (process.env.NODE_ENV !== 'production') {
       res.redirect('http://localhost:3000/');
@@ -44,7 +46,9 @@ app.get('/', (req, res) => {
 
 });
 
-const mediaServer = new MediaServer();
+app.get('/api/roomlist', (req, res) => {
+  res.send({listing: mediaServer.listRooms()});
+});
 
 const wss = ws(server, mediaServer);
 

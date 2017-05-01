@@ -36,6 +36,18 @@ module.exports = class MediaServer {
                 port: 5004
             }
         });
+
+        this.roomList = {};
+    }
+
+    listRooms() {
+        const listing = [];
+
+        for (var k in this.roomList) {
+            listing.push(k);
+        }
+
+        return { listing };
     }
 
     broadcastStream(sdp) {

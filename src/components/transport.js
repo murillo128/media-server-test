@@ -6,7 +6,7 @@ export default class Transport extends EventEmitter {
         super();
         this.uuid = null;
         const protocol = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
-        this.ws = new window.WebSocket(`${protocol}//${window.location.hostname}:8080`);
+        this.ws = new window.WebSocket(`${protocol}//${window.location.hostname}:${window.location.port}`);
 
         this.ws.onopen = () => {
             this.once('uuid', () => {

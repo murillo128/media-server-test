@@ -29,7 +29,7 @@ const createWebSocketServer = (server, mediaServer) => {
 
            switch (parsedMessage.event) {
                case 'login':
-                   console.log('login message recieved');
+                   console.log('login message received');
                    break;
 
                case 'broadcast':

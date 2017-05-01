@@ -2,7 +2,7 @@ import React from 'react';
 import { Header, Button } from 'react-bootstrap';
 import Transport from '../components/transport';
 
-export default class Home extends React.PureComponent {
+export default class Broadcast extends React.PureComponent {
 
     constructor () {
         super();
@@ -60,10 +60,12 @@ export default class Home extends React.PureComponent {
         });
 
         this.transport.on('broadcasting', (answer) => {
-            this.state.broadcastStream = pc.setRemoteDescription(new RTCSessionDescription({
+
+            pc.setRemoteDescription(new RTCSessionDescription({
                 type: 'answer',
                 sdp: answer
             })).then(() => {
+                debugger;
                 console.log('Joined the stream')
             }).catch((err) => {
                 console.error('Error Joining stream')
