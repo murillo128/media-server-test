@@ -12,10 +12,36 @@ export default class Transport extends EventEmitter {
             this.once('uuid', () => {
                 this.emit('open');
             });
+            this.on('broadcast', () => {
+                console.log('broadcast response')
+            })
             this.send({
                 event: 'login',
                 user: getUser() || 'guest'
             });
+        };
+
+        this.ws.onmessage = (message) => {
+
+            let ev;
+            try {
+                ev = JSON.parse(message.data);
+            } catch(err) {
+                this.emit('error', err, { reason: 'failed to parse message' });
+                return;
+            }
+
+            if (ev.uuid) {
+                this.uuid = ev.uuid;
+                this.emit('uuid', this.uuid);
+                return;
+            }
+            else if (ev.broadcastResponse) {
+                const answer = ev.broadcastResponse;
+                this.emit('broadcasting', answer);
+            }
+
+            this.emit('message', ev);
         };
     }
 

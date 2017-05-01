@@ -2,7 +2,7 @@ const uuid = require('uuid');
 const WebSocket = require('ws');
 const log = require('./log');
 
-const createWebSocketServer = (server) => {
+const createWebSocketServer = (server, mediaServer) => {
 
     const WebSocketServer = WebSocket.Server;
     const wss = new WebSocketServer({
@@ -34,7 +34,10 @@ const createWebSocketServer = (server) => {
 
                case 'broadcast':
                    // --- Start the stream here
-                   console.log('broadcast message recieved');
+                   const sdp = parsedMessage.sdp;
+
+                   const answer = mediaServer.broadcastStream(sdp);
+                   send({broadcastResponse: answer});
                    break;
            }
        })

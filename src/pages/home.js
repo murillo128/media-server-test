@@ -12,14 +12,70 @@ export default class Home extends React.PureComponent {
         }
     }
 
+    destroy (cb) {
+        this.setState({broadcasting:false}, cb);
+    }
+
     broadcast () {
         this.setState({broadcasting: true});
-        this.transport = new Transport();
 
+        this.transport = new Transport();
         this.transport.once('open', () => {
 
-            console.log('Transport Open')
+            if (!window.RTCPeerConnection) {
+                return this.destroy();
+            }
+
+            const pc = this.localPC = new RTCPeerConnection({
+                bundlePolicy: "max-bundle",
+                rtcpMuxPolicy : "require"
+            });
+
+            pc.onaddstream = (event) => {
+                console.debug("onAddStream",event);
+            };
+
+            pc.onremovestream = () => {
+                console.debug("onRemoveStream",event);
+            };
+
+            pc.createOffer({
+                offerToReceiveVideo: true
+            }).then((offer) => {
+                console.debug("createOffer sucess",offer);
+                const sdp = offer.sdp;
+                pc.setLocalDescription(offer);
+                console.debug("offset set as local description", offer);
+                this.transport.send({
+                    event: 'broadcast',
+                    sdp
+                });
+
+            }).catch((error) => {
+                console.error("Error broadcasting video", error);
+            })
+
         });
+
+        this.transport.on('broadcasting', (answer) => {
+            this.state.broadcastStream = this.localPC.setRemoteDescription(new RTCSessionDescription({
+                type: 'answer',
+                sdp: answer
+            })).then(() => {
+                console.log('Joined the stream')
+            }).catch((err) => {
+                console.error('Error Joining stream')
+            })
+        });
+
+        this.transport.on('error', (err) => {
+            console.log('error opening transport', err);
+            this.destroy();
+        });
+        this.transport.on('close', () => {
+          this.destroy()
+        });
+
     }
 
     componentWillMount() {
@@ -27,10 +83,9 @@ export default class Home extends React.PureComponent {
             audio: true,
             video: true
         }).then((stream) => {
-            debugger
             this.setState({stream});
         }).catch((err) => {
-            console.log(err)
+            console.log(err);
             this.error = err;
         });
     }
@@ -60,7 +115,7 @@ export default class Home extends React.PureComponent {
                 </div>
 
                 {
-                    this.state.broadcasting === null ?
+                    this.state.broadcasting !== true ?
                     <Button onClick={broadcastOnClick}>Broadcast Stream</Button>
                     :'Broadcasting...'
                 }
