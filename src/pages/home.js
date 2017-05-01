@@ -19,6 +19,8 @@ export default class Home extends React.PureComponent {
     broadcast () {
         this.setState({broadcasting: true});
 
+        let pc = null;
+
         this.transport = new Transport();
         this.transport.once('open', () => {
 
@@ -26,7 +28,7 @@ export default class Home extends React.PureComponent {
                 return this.destroy();
             }
 
-            const pc = this.localPC = new RTCPeerConnection({
+            pc = new RTCPeerConnection({
                 bundlePolicy: "max-bundle",
                 rtcpMuxPolicy : "require"
             });
@@ -58,7 +60,7 @@ export default class Home extends React.PureComponent {
         });
 
         this.transport.on('broadcasting', (answer) => {
-            this.state.broadcastStream = this.localPC.setRemoteDescription(new RTCSessionDescription({
+            this.state.broadcastStream = pc.setRemoteDescription(new RTCSessionDescription({
                 type: 'answer',
                 sdp: answer
             })).then(() => {
