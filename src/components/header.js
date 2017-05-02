@@ -1,6 +1,6 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Navbar, Nav, NavItem, } from 'react-bootstrap';
+import { Navbar, Nav, NavItem } from 'react-bootstrap';
 
 
 const Header = () => (
@@ -8,7 +8,7 @@ const Header = () => (
     <Navbar>
         <Navbar.Header>
             <Navbar.Brand>
-                <a href="#">React-Bootstrap</a>
+                <a href="/">Medooze MediaServer Demo</a>
             </Navbar.Brand>
         </Navbar.Header>
         <Nav>
