@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 
-export default class RoomList extends React.PureComponent {
+export default class RoomList extends React.Component {
     constructor() {
         super();
 
