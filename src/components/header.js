@@ -1,17 +1,29 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { LinkContainer } from 'react-router-bootstrap';
+import { Navbar, Nav, NavItem, } from 'react-bootstrap';
+
 
 const Header = () => (
 
-    <header>
-        <nav>
-            <ul>
-                <li><Link to='/roomlist'>Room List</Link></li>
-                <li><Link to='/broadcast'>Broadcast</Link></li>
-                <li><Link to='/login'>Login</Link></li>
-            </ul>
-        </nav>
-    </header>
+    <Navbar>
+        <Navbar.Header>
+            <Navbar.Brand>
+                <a href="#">React-Bootstrap</a>
+            </Navbar.Brand>
+        </Navbar.Header>
+        <Nav>
+            <LinkContainer to="/roomlist">
+                <NavItem eventKey={1} >RoomList</NavItem>
+            </LinkContainer>
+            <LinkContainer to="/broadcast">
+                <NavItem eventKey={2} >Broadcast</NavItem>
+            </LinkContainer>
+            <LinkContainer to="/login">
+                <NavItem eventKey={3} >Login</NavItem>
+            </LinkContainer>
+
+        </Nav>
+    </Navbar>
 );
 
 module.exports = Header;
