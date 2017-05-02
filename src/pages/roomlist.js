@@ -6,7 +6,7 @@ export default class RoomList extends React.Component {
         super();
 
         this.state = {
-            listing: []
+            listing: {}
         }
     }
 
@@ -24,7 +24,14 @@ export default class RoomList extends React.Component {
     }
 
     render() {
-        return (<div>Room List</div>);
+
+        const listing = this.state.listing;
+        const rooms = Object.keys(listing).map(function(key) {
+            return <div>Key: {key}, Value: {listing[key]}</div>;
+        })
+        return (<div>Room List
+            {rooms}
+        </div>);
     }
 
 }

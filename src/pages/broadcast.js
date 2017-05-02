@@ -60,12 +60,10 @@ export default class Broadcast extends React.Component {
         });
 
         this.transport.on('broadcasting', (answer) => {
-
             pc.setRemoteDescription(new RTCSessionDescription({
                 type: 'answer',
                 sdp: answer
             })).then(() => {
-                debugger;
                 console.log('Joined the stream')
             }).catch((err) => {
                 console.error('Error Joining stream')
@@ -84,7 +82,7 @@ export default class Broadcast extends React.Component {
 
     componentWillMount() {
         navigator.mediaDevices.getUserMedia({
-            audio: true,
+            audio: false,
             video: true
         }).then((stream) => {
             this.setState({stream});

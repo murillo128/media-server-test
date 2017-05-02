@@ -23,17 +23,13 @@ if (process.argv.length !=3 )
 const ip = process.argv[2];
 
 let port = process.env.PORT;
-let server;
-if (process.env.ENABLE_SSL) {
-  server = https.createServer({
+
+const  server = https.createServer({
     key: fs.readFileSync(path.join(__dirname, '..', 'key.pem')),
     cert: fs.readFileSync(path.join(__dirname, '..', 'cert.pem'))
   }, app);
   port = port || 8443;
-} else {
-  server = http.createServer(app);
-  port = port || 8080;
-}
+
 
 const mediaServer = new MediaServer(ip);
 
