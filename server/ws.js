@@ -36,7 +36,7 @@ const createWebSocketServer = (server, mediaServer) => {
                    // --- Start the stream here
                    const sdp = parsedMessage.sdp;
 
-                   const answer = mediaServer.broadcastStream(sdp);
+                   const answer = mediaServer.broadcastStream(ws.uuid, sdp);
                    send({broadcastResponse: answer});
                    break;
            }

@@ -37,20 +37,24 @@ module.exports = class MediaServer {
             }
         });
 
-        this.roomList = {};
+        this.rooms = {};
+        this.peers = {};
     }
 
     listRooms() {
         const listing = [];
 
-        for (var k in this.roomList) {
+        for (var k in this.rooms) {
             listing.push(k);
         }
 
         return { listing };
     }
 
-    broadcastStream(sdp) {
+    broadcastStream(id, sdp) {
+
+        // --- Create Room
+        this.rooms[id] = {};
 
         const offer = SDPInfo.process(sdp);
         //Create an DTLS ICE transport in that enpoint
@@ -131,6 +135,11 @@ module.exports = class MediaServer {
 
         //Get local stream info
         const info = outgoingStream.getStreamInfo();
+
+        this.rooms[id] = {
+            name: 'unknown',
+            info
+        };
 
         //Add local stream info it to the answer
         answer.addStream(info);
