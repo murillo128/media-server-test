@@ -35,7 +35,7 @@ if (process.env.ENABLE_SSL) {
   port = port || 8080;
 }
 
-const mediaServer = new MediaServer();
+const mediaServer = new MediaServer(ip);
 
 app.get('/', (req, res) => {
   if (process.env.NODE_ENV !== 'production') {
