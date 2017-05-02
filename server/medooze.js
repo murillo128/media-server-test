@@ -42,13 +42,7 @@ module.exports = class MediaServer {
     }
 
     listRooms() {
-        const listing = [];
-
-        for (var k in this.rooms) {
-            listing.push(k);
-        }
-
-        return { listing };
+        return this.rooms;
     }
 
     broadcastStream(id, sdp) {
@@ -144,7 +138,7 @@ module.exports = class MediaServer {
         //Add local stream info it to the answer
         answer.addStream(info);
 
-        return answer;
+        return answer.toString();
     }
 };
 
