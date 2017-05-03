@@ -30,13 +30,14 @@ const createWebSocketServer = (server, mediaServer) => {
            switch (parsedMessage.event) {
                case 'login':
                    console.log('login message received');
+                   ws.user = parsedMessage.user;
                    break;
 
                case 'broadcast':
                    // --- Start the stream here
                    const sdp = parsedMessage.sdp;
 
-                   const answer = mediaServer.broadcastStream(ws.uuid, sdp);
+                   const answer = mediaServer.broadcastStream(ws.user, sdp);
                    send({broadcastResponse: answer});
                    break;
            }

@@ -17,7 +17,7 @@ export default class Transport extends EventEmitter {
             })
             this.send({
                 event: 'login',
-                user: getUser() || 'guest'
+                user: getUser()
             });
         };
 

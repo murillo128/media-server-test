@@ -131,8 +131,7 @@ module.exports = class MediaServer {
         const info = outgoingStream.getStreamInfo();
 
         this.rooms[id] = {
-            name: 'unknown',
-            info
+            session: this.session,
         };
 
         //Add local stream info it to the answer
