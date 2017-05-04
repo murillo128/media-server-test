@@ -29,6 +29,10 @@ export default class Broadcast extends React.Component {
             }
 
             pc = new RTCPeerConnection({
+                iceServers: [
+                    {'urls': 'stun:stun.services.mozilla.com'},
+                    {'urls': 'stun:stun.l.google.com:19302'}
+                ],
                 bundlePolicy: "max-bundle",
                 rtcpMuxPolicy : "require"
             });
@@ -40,6 +44,16 @@ export default class Broadcast extends React.Component {
             pc.onremovestream = () => {
                 console.debug("onRemoveStream",event);
             };
+
+            pc.onicecandidate = (e) => {
+                console.log("on ice candidate");
+            };
+
+            pc.oniceconnectionstatechange = (e) => {
+                console.log("ice candidate state change");
+            };
+
+            pc.addStream(this.state.stream);
 
             pc.createOffer({
                 offerToReceiveVideo: true
@@ -64,9 +78,9 @@ export default class Broadcast extends React.Component {
                 type: 'answer',
                 sdp: answer
             })).then(() => {
-                console.log('Joined the stream')
+                console.log('Joined the stream');
             }).catch((err) => {
-                console.error('Error Joining stream')
+                console.error('Error Joining stream');
             })
         });
 

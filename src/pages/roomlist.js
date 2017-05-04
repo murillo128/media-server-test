@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from 'axios';
+import { Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 export default class RoomList extends React.Component {
     constructor() {
@@ -25,10 +27,19 @@ export default class RoomList extends React.Component {
 
     render() {
 
+        const onClick = (key) => {
+            console.log(`on click ${key}`);
+        };
+
         const listing = this.state.listing;
-        const rooms = Object.keys(listing).map(function(key) {
-            return <div>Key: {key}, Value: {listing[key]}</div>;
-        })
+        const rooms = Object.keys(listing).map(function(key, index) {
+            return (<div>
+                <Link to={`/cam/${key}`} >
+                    <Button key={index} >{key}</Button>
+                </Link>
+            </div>);
+        });
+
         return (<div>Room List
             {rooms}
         </div>);
