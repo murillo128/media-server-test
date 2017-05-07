@@ -21,8 +21,28 @@ module.exports = class MediaServer {
 
         this.endpoint = medoozeMediaServer.createEndpoint(publicIp);
 
-        //Create new streamer
-        const streamer = this.streamer = medoozeMediaServer.createStreamer();
+        this.streamer = medoozeMediaServer.createStreamer();
+
+        this.rooms = {};
+    }
+
+    listRooms() {
+        return this.rooms;
+    }
+
+    viewBroadcastStream(id) {
+        const roomData = this.rooms[id];
+        const session = roomData.session;
+
+        //Copy incoming data from the broadcast stream to the local one
+        // outgoingStream.getVideoTracks()[0].attachTo(session.getIncomingStreamTrack());
+
+    }
+
+    broadcastStream(id, offerSdp) {
+
+        // --- Create Room
+        this.rooms[id] = {};
 
         //Create new video session codecs
         const video = new MediaInfo("video","video");
@@ -31,26 +51,13 @@ module.exports = class MediaServer {
         video.addCodec(new CodecInfo("h264",96));
 
         //Create session for video
-        const session = this.session = streamer.createSession(video,{
+        const session = this.streamer.createSession(video,{
             local  : {
                 port: 5004
             }
         });
 
-        this.rooms = {};
-        this.peers = {};
-    }
-
-    listRooms() {
-        return this.rooms;
-    }
-
-    broadcastStream(id, sdp) {
-
-        // --- Create Room
-        this.rooms[id] = {};
-
-        const offer = SDPInfo.process(sdp);
+        const offer = SDPInfo.process(offerSdp);
         //Create an DTLS ICE transport in that enpoint
         const transport = this.endpoint.createTransport({
             dtls : offer.getDTLS(),
@@ -107,7 +114,7 @@ module.exports = class MediaServer {
             //Add video codecs
             video.addCodec(h264);
             //Set recv only
-            video.setDirection(Direction.RECVONLY);
+            video.setDirection(Direction.SENDRECV);
             //Add it to answer
             answer.addMedia(video);
         }
@@ -118,24 +125,27 @@ module.exports = class MediaServer {
             video : answer.getMedia("video")
         });
 
-        //Create new local stream with only video
-        const outgoingStream  = transport.createOutgoingStream({
-            audio: false,
-            video: true
-        });
+        for (let offered of offer.getStreams().values())
+        {
+            //Create the remote stream into the transport
+            const incomingStream = transport.createIncomingStream(offered);
 
-        //Copy incoming data from the broadcast stream to the local one
-        outgoingStream.getVideoTracks()[0].attachTo(this.session.getIncomingStreamTrack());
+            //Create new local stream with only video
+            const outgoingStream  = transport.createOutgoingStream({
+                audio: false,
+                video: true
+            });
 
-        //Get local stream info
-        const info = outgoingStream.getStreamInfo();
+            //Get local stream info
+            const info = outgoingStream.getStreamInfo();
 
-        this.rooms[id] = {
-            session: this.session,
-        };
+            //Copy incoming data from the remote stream to the local one
+            outgoingStream.attachTo(incomingStream);
 
-        //Add local stream info it to the answer
-        answer.addStream(info);
+            //Add local stream info it to the answer
+            answer.addStream(info);
+
+        }
 
         return answer.toString();
     }

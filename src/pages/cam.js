@@ -1,4 +1,5 @@
 import React from 'react';
+import Transport from '../components/transport';
 
 export default class Cam extends React.Component {
 
@@ -16,35 +17,13 @@ export default class Cam extends React.Component {
 
     componentWillMount() {
 
-        const peerConnectionConfig = {
-            'iceServers': [
-                {'urls': 'stun:stud.services.mozilla.com'},
-                {'urls': 'stun:stun.l.google.com:19302'}
-            ]
-        };
+       this.transport = new Transport();
+       this.transport.once('open', () => {
 
-        const onIceCandidate = (event) => {
-            if (event.candidate !== null) {
+           if (!window.RTCPeerConnection) {
 
-            }
-        };
-
-        const onAddStream = () => {
-
-        };
-
-        const peerConnection = new window.RTCPeerConnection(peerConnectionConfig);
-        peerConnection.onicecandidate = onIceCandidate;
-        peerConnection.onaddstream = onAddStream;
-
-
-
-
-        // --- Setup Websocket
-
-        // --- Setup Peer connection
-
-        // --- Add callbacks to render stream to the remote video
+           }
+       });
 
     }
 

@@ -8,7 +8,9 @@ export default class Broadcast extends React.Component {
         super();
 
         this.state = {
-            broadcasting: null
+            broadcasting: null,
+            stream: null,
+            remoteStream: null
         }
     }
 
@@ -24,43 +26,29 @@ export default class Broadcast extends React.Component {
         this.transport = new Transport();
         this.transport.once('open', () => {
 
-            if (!window.RTCPeerConnection) {
-                return this.destroy();
-            }
-
             pc = new RTCPeerConnection({
-                iceServers: [
-                    {'urls': 'stun:stun.services.mozilla.com'},
-                    {'urls': 'stun:stun.l.google.com:19302'}
-                ],
                 bundlePolicy: "max-bundle",
                 rtcpMuxPolicy : "require"
             });
 
+            pc.addStream(this.state.stream);
+
             pc.onaddstream = (event) => {
-                console.debug("onAddStream",event);
+                this.setState({remoteStream: event.stream});
+                console.log("onAddStream",event);
             };
 
             pc.onremovestream = () => {
-                console.debug("onRemoveStream",event);
+                console.log("onRemoveStream",event);
             };
-
-            pc.onicecandidate = (e) => {
-                console.log("on ice candidate");
-            };
-
-            pc.oniceconnectionstatechange = (e) => {
-                console.log("ice candidate state change");
-            };
-
-            pc.addStream(this.state.stream);
 
             pc.createOffer({
                 offerToReceiveVideo: true
             }).then((offer) => {
+
                 console.debug("createOffer sucess",offer);
                 const sdp = offer.sdp;
-                pc.setLocalDescription(offer);
+                pc.setLocalDescription(new RTCSessionDescription(offer));
                 console.debug("offset set as local description", offer);
                 this.transport.send({
                     event: 'broadcast',
@@ -70,7 +58,6 @@ export default class Broadcast extends React.Component {
             }).catch((error) => {
                 console.error("Error broadcasting video", error);
             })
-
         });
 
         this.transport.on('broadcasting', (answer) => {
@@ -132,8 +119,18 @@ export default class Broadcast extends React.Component {
 
                 {
                     this.state.broadcasting !== true ?
-                    <Button onClick={broadcastOnClick}>Broadcast Stream</Button>
-                    :'Broadcasting...'
+                        (
+                            <Button onClick={broadcastOnClick}>Broadcast Stream</Button>
+                        ) :
+                        (
+                            <video autoPlay={true} ref={(e) => {
+                                if (!this.el && e) {
+                                    this.el = e;
+                                }
+                                this.el.srcObject = this.state.remoteStream;
+                            }}></video>
+                        )
+
                 }
 
             </div>
