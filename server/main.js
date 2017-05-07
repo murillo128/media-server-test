@@ -13,7 +13,7 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use('/dist', express.static(path.join(__dirname, '..', 'dist')));
+app.use('/', express.static(path.join(__dirname, '..', 'build')));
 
 // copied over from media-server-demo
 // is this the best way to get the IP?
@@ -37,10 +37,40 @@ app.get('/', (req, res) => {
   if (process.env.NODE_ENV !== 'production') {
       res.redirect('http://localhost:3000/');
   }
-
-  // TODO: else load out of build folder
-
+  else {
+      res.sendFile(path.join(__dirname, '../build', 'index.html'));
+  }
 });
+
+app.get('/roomlist', (req, res) => {
+    if (process.env.NODE_ENV !== 'production') {
+        res.redirect('http://localhost:3000/roomlist');
+    }
+    else {
+        res.sendFile(path.join(__dirname, '../build', 'index.html'));
+    }
+});
+
+app.get('/broadcast', (req, res) => {
+    if (process.env.NODE_ENV !== 'production') {
+        res.redirect('http://localhost:3000/broadcast');
+    }
+    else {
+        res.sendFile(path.join(__dirname, '../build', 'index.html'));
+    }
+});
+
+app.get('/cam/:camname', (req, res) => {
+    if (process.env.NODE_ENV !== 'production') {
+        res.redirect('http://localhost:3000/cam/' + req.params.camname);
+    }
+    else {
+        res.sendFile(path.join(__dirname, '../build', 'index.html'));
+    }
+});
+
+
+
 
 app.get('/api/roomlist', (req, res) => {
   res.send({listing: mediaServer.listRooms()});
