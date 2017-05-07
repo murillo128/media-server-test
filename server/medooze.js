@@ -37,7 +37,6 @@ module.exports = class MediaServer {
         const videoOffer = roomData.videoOffer;
         const audioOffer = roomData.audioOffer;
 
-
         const offer = SDPInfo.process(offerSdp);
         //Create an DTLS ICE transport in that enpoint
         const transport = this.endpoint.createTransport({
