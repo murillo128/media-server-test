@@ -7,26 +7,60 @@ export default class Cam extends React.Component {
         super();
 
         const roomName = props.match.params.roomname;
-        const stream = null;
+        const remoteStream = null;
 
         this.state = {
             roomName,
-            stream
+            remoteStream
         }
     }
 
     componentWillMount() {
+        let pc = null;
+        this.transport = new Transport();
+        this.transport.once('open', () => {
 
-       this.transport = new Transport();
-       this.transport.once('open', () => {
 
-           if (!window.RTCPeerConnection) {
+            pc = new RTCPeerConnection({
+                bundlePolicy: "max-bundle",
+                rtcpMuxPolicy: "require"
+            });
 
-           }
-       });
+            pc.onaddstream = (event) => {
+                this.setState({remoteStream: event.stream});
+                console.log("onAddStream", event);
+            };
 
+            pc.createOffer({
+                offerToReceiveVideo: true
+            }).then((offer) => {
+
+                console.debug("createOffer sucess", offer);
+                const sdp = offer.sdp;
+                pc.setLocalDescription(new RTCSessionDescription(offer));
+                console.debug("offset set as local description", offer);
+                this.transport.send({
+                    event: 'requestToViewBroadcast',
+                    sdp,
+                    roomName: this.state.roomName
+                });
+
+            });
+        });
+
+        this.transport.on('viewableBroadcast', (answer) => {
+debugger
+            pc.setRemoteDescription(new RTCSessionDescription({
+                type: 'answer',
+                sdp: answer
+            })).then(() => {
+                console.log('Joined the stream');
+            }).catch((err) => {
+                console.error('Error Joining stream');
+            })
+
+        });
     }
-
     render() {
 
         const title = `On Cam Page for ${this.state.roomName}`;
@@ -35,13 +69,16 @@ export default class Cam extends React.Component {
             <div>{title}</div>
             <div>
             {
-                this.state.stream ? (
+                this.state.remoteStream ? (
 
                     <video autoPlay={true} ref={(e) => {
-                        if (!this.previewEl && e) {
-                            this.previewEl = e;
+                        if (!this.qq && e) {
+                            this.qq = e;
                         }
-                        this.previewEl.srcObject = this.state.stream;
+
+                        console.log('remote stream', this.state.remoteStream)
+
+                        this.qq.srcObject = this.state.remoteStream;
                     }}></video>
                 ) : null
             }
