@@ -69,8 +69,14 @@ app.get('/cam/:camname', (req, res) => {
     }
 });
 
-
-
+app.get('/viewrtpcam', (req, res) => {
+    if (process.env.NODE_ENV !== 'production') {
+        res.redirect('http://localhost:3000/viewrtpcam');
+    }
+    else {
+        res.sendFile(path.join(__dirname, '../build', 'index.html'));
+    }
+});
 
 app.get('/api/roomlist', (req, res) => {
   res.send({listing: mediaServer.listRooms()});

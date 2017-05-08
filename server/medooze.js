@@ -19,11 +19,12 @@ module.exports = class MediaServer {
         const enableDebug = process.env.Node_ENV !== 'production';
         medoozeMediaServer.enableDebug(enableDebug);
 
+        this.ip = publicIp;
         this.endpoint = medoozeMediaServer.createEndpoint(publicIp);
 
-        this.streamer = medoozeMediaServer.createStreamer();
-
         this.rooms = {};
+
+        this.streamer = medoozeMediaServer.createStreamer();
     }
 
     listRooms() {
@@ -82,7 +83,7 @@ module.exports = class MediaServer {
             //Add video codecs
             video.addCodec(h264);
             //Set recv only
-            video.setDirection(Direction.RECVONLY);
+            video.setDirection(Direction.SENDONLY);
             //Add it to answer
             answer.addMedia(video);
         }
@@ -117,7 +118,105 @@ module.exports = class MediaServer {
 
     }
 
+    viewRTPBroadcastStream(offerSDP, port) {
+
+        const videoPort = 5004;
+
+        const receiver = {};
+
+        //Create new video session codecs
+        const video = new MediaInfo("video", "video");
+
+        //Add h264 codec
+        video.addCodec(new CodecInfo("h264", 96));
+
+        //Create session for video
+        receiver.video = this.streamer.createSession(video, {
+            local  : {
+                port: videoPort
+            }
+        });
+
+        //Process the sdp
+        const offer = SDPInfo.process(offerSDP);
+
+        //Create an DTLS ICE transport in that enpoint
+        const transport = this.endpoint.createTransport({
+            dtls : offer.getDTLS(),
+            ice  : offer.getICE()
+        });
+
+        //Set RTP remote properties
+        transport.setRemoteProperties({
+            audio : offer.getMedia("audio"),
+            video : offer.getMedia("video")
+        });
+
+        //Get local DTLS and ICE info
+        const dtls = transport.getLocalDTLSInfo();
+        const ice  = transport.getLocalICEInfo();
+
+        //Get local candidates
+        const candidates = this.endpoint.getLocalCandidates();
+
+        //Create local SDP info
+        const answer = new SDPInfo();
+
+        //Add ice and dtls info
+        answer.setDTLS(dtls);
+        answer.setICE(ice);
+        //For each local candidate
+        for (let i=0;i<candidates.length;++i)
+            //Add candidate to media info
+            answer.addCandidate(candidates[i]);
+
+        //Get remote video m-line info
+        const videoOffer = offer.getMedia("video");
+
+        //If offer had video
+        if (videoOffer)
+        {
+            //Create video media
+            const video = new MediaInfo(videoOffer.getId(), "video");
+
+            //Get codec types
+            const h264 = videoOffer.getCodec("h264");
+            //Add video codecs
+            video.addCodec(h264);
+            //Set send only
+            video.setDirection(Direction.RECVONLY);
+            //Add it to answer
+            answer.addMedia(video);
+        }
+
+        //Set RTP local  properties
+        transport.setLocalProperties({
+            video : answer.getMedia("video"),
+            audio: answer.getMedia("audio")
+        });
+
+        //Create new local stream to send to browser
+        const outgoingStream  = transport.createOutgoingStream({
+            audio: false,
+            video: true
+        });
+
+        //Copy incoming data from the broadcast stream to the local one
+        outgoingStream.getVideoTracks()[0].attachTo(receiver.video.getIncomingStreamTrack());
+
+        //Get local stream info
+        const info = outgoingStream.getStreamInfo();
+
+        //Add local stream info it to the answer
+        answer.addStream(info);
+
+        return answer.toString();
+
+    }
+
     broadcastStream(id, offerSdp) {
+
+        const broadcast = {};
 
         //Create new video session codecs
         const video = new MediaInfo("video","video");
@@ -185,6 +284,17 @@ module.exports = class MediaServer {
             video.setDirection(Direction.SENDRECV);
             //Add it to answer
             answer.addMedia(video);
+
+            const ip = this.ip;
+            const port = 5004;
+
+            // --- Setup RTP Video Session
+            broadcast.video = this.streamer.createSession(video, {
+                remote: {
+                    ip,
+                    port
+                }
+            })
         }
 
         //Set RTP local  properties
@@ -198,7 +308,8 @@ module.exports = class MediaServer {
             transport,
             videoOffer,
             audioOffer,
-            incomingStreams: []
+            incomingStreams: [],
+            broadcast
         };
 
         for (let offered of offer.getStreams().values())
@@ -219,6 +330,9 @@ module.exports = class MediaServer {
 
             //Copy incoming data from the remote stream to the local one
             outgoingStream.attachTo(incomingStream);
+
+            // --- Populate the RTP Stream
+            broadcast.video.getOutgoingStreamTrack().attachTo(incomingStream.getVideoTracks()[0]);
 
             //Add local stream info it to the answer
             answer.addStream(info);

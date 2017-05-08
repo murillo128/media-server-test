@@ -4,6 +4,8 @@ import RoomList from './pages/roomlist';
 import Broadcast from './pages/broadcast';
 import Login from './pages/login';
 import Cam from './pages/cam';
+import ViewRTPCam from './pages/viewrtpcam';
+
 import getUser from './components/user';
 
 export default class Main extends React.Component {
@@ -27,6 +29,7 @@ export default class Main extends React.Component {
                 <Route path='/broadcast' render={checkAuth} />
                 <Route path='/login' component={Login} />
                 <Route path='/cam/:roomname' component={Cam} />
+                <Route path='/viewrtpcam' component={ViewRTPCam} />
             </Switch>
         </main>);
     }

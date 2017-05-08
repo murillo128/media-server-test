@@ -84,7 +84,10 @@ export default class Broadcast extends React.Component {
     componentWillMount() {
         navigator.mediaDevices.getUserMedia({
             audio: false,
-            video: true
+            video: {
+                width: { min: 480, ideal: 480, max: 1920 },
+                height: { min: 320, ideal: 320, max: 1080 }
+            }
         }).then((stream) => {
             this.setState({stream});
         }).catch((err) => {
@@ -107,7 +110,7 @@ export default class Broadcast extends React.Component {
                 {
                     this.state.stream ? (
 
-                        <video autoPlay={true} ref={(e) => {
+                        <video width="480" height="320" autoPlay={true} ref={(e) => {
                             if (!this.previewEl && e) {
                                 this.previewEl = e;
                             }
@@ -123,7 +126,7 @@ export default class Broadcast extends React.Component {
                             <Button onClick={broadcastOnClick}>Broadcast Stream</Button>
                         ) :
                         (
-                            <video autoPlay={true} ref={(e) => {
+                            <video width="480" height="320" autoPlay={true} ref={(e) => {
                                 if (!this.el && e) {
                                     this.el = e;
                                 }
