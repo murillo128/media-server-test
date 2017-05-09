@@ -40,6 +40,11 @@ export default class Transport extends EventEmitter {
                 const answer = ev.broadcastResponse;
                 this.emit('broadcasting', answer);
             }
+            else if (ev.viewableBroadcast) {
+                const ans = ev.viewableBroadcast;
+                this.emit('viewableBroadcast', ans);
+
+            }
 
             this.emit('message', ev);
         };

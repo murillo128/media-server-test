@@ -40,6 +40,18 @@ const createWebSocketServer = (server, mediaServer) => {
                    const answer = mediaServer.broadcastStream(ws.user, sdp);
                    send({broadcastResponse: answer});
                    break;
+
+               case 'requestToViewBroadcast':
+
+                   const viewableBroadcastAnswer = mediaServer.viewBroadcastStream(parsedMessage.roomName, parsedMessage.sdp);
+                   send({viewableBroadcast: viewableBroadcastAnswer});
+                   break;
+
+               case 'requestToViewRTPBroadcast':
+
+                   const viewableBroadcastRTPAnswer = mediaServer.viewRTPBroadcastStream(parsedMessage.sdp, parsedMessage.port);
+                   send({viewableRTPBroadcast: viewableBroadcastRTPAnswer});
+                   break;
            }
        })
     });

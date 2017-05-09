@@ -1,18 +1,16 @@
 import React from 'react';
 import Transport from '../components/transport';
 
-export default class Cam extends React.Component {
+export default class ViewRTPCam extends React.Component {
 
     constructor(props, b) {
         super();
 
-        const roomName = props.match.params.roomname;
         const remoteStream = null;
 
         this.state = {
-            roomName,
             remoteStream
-        }
+        };
     }
 
     componentWillMount() {
@@ -35,21 +33,20 @@ export default class Cam extends React.Component {
                 offerToReceiveVideo: true
             }).then((offer) => {
 
-                console.debug("createOffer sucess", offer);
+                console.debug("createOffer success", offer);
                 const sdp = offer.sdp;
                 pc.setLocalDescription(new RTCSessionDescription(offer));
                 console.debug("offset set as local description", offer);
                 this.transport.send({
-                    event: 'requestToViewBroadcast',
+                    event: 'requestToViewRTPBroadcast',
                     sdp,
-                    roomName: this.state.roomName
+                    port: 5004
                 });
 
             });
         });
 
-        this.transport.on('viewableBroadcast', (answer) => {
-debugger
+        this.transport.on('viewableRTPBroadcast', (answer) => {
             pc.setRemoteDescription(new RTCSessionDescription({
                 type: 'answer',
                 sdp: answer
@@ -63,25 +60,23 @@ debugger
     }
     render() {
 
-        const title = `On Cam Page for ${this.state.roomName}`;
-
         return (<div>
-            <div>{title}</div>
+            <div>ViewRTPBroadcast</div>
             <div>
-            {
-                this.state.remoteStream ? (
+                {
+                    this.state.remoteStream ? (
 
-                    <video autoPlay={true} ref={(e) => {
-                        if (!this.qq && e) {
-                            this.qq = e;
-                        }
+                        <video autoPlay={true} ref={(e) => {
+                            if (!this.qq && e) {
+                                this.qq = e;
+                            }
 
-                        console.log('remote stream', this.state.remoteStream)
+                            console.log('remote stream', this.state.remoteStream)
 
-                        this.qq.srcObject = this.state.remoteStream;
-                    }}></video>
-                ) : null
-            }
+                            this.qq.srcObject = this.state.remoteStream;
+                        }}></video>
+                    ) : null
+                }
 
             </div>
         </div>);
